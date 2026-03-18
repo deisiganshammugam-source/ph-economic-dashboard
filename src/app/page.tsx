@@ -1,8 +1,8 @@
 import { supabase } from "@/lib/supabase";
 import Dashboard from "@/components/Dashboard";
 
-// Revalidate every hour — data only changes once daily
-export const revalidate = 3600;
+// Always fetch fresh data from Supabase on each request
+export const dynamic = "force-dynamic";
 
 async function getDailyMarket() {
   const sixMonthsAgo = new Date();
