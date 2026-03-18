@@ -117,7 +117,8 @@ export default function Dashboard({ dailyMarket, indicators, lastRefresh }: Dash
         <section>
           <h2 className="text-lg font-semibold text-gray-800 mb-3">Macro Fundamentals (IMF WEO)</h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {IMF_INDICATORS.map((ind) => {
+            {IMF_INDICATORS.map((ind, i) => {
+              const colors = ["#6366F1", "#EC4899", "#0EA5E9", "#F59E0B", "#14B8A6"];
               const data = (byCode[ind.code] || []).map((r) => ({
                 date: r.date,
                 value: r.value,
@@ -127,7 +128,7 @@ export default function Dashboard({ dailyMarket, indicators, lastRefresh }: Dash
                   key={ind.code}
                   title={ind.name}
                   data={data}
-                  color="#6366F1"
+                  color={colors[i % colors.length]}
                   unit={ind.unit}
                 />
               );
@@ -139,8 +140,12 @@ export default function Dashboard({ dailyMarket, indicators, lastRefresh }: Dash
         <section>
           <h2 className="text-lg font-semibold text-gray-800 mb-3">Annual Context (World Bank)</h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {(["BX.TRF.PWKR.CD.DT", "FP.CPI.TOTL.ZG", "NY.GDP.MKTP.KD.ZG", "BN.CAB.XOKA.GD.ZS"] as const).map(
-              (code) => {
+            {([
+              { code: "BX.TRF.PWKR.CD.DT", color: "#8B5CF6" },
+              { code: "FP.CPI.TOTL.ZG", color: "#F43F5E" },
+              { code: "NY.GDP.MKTP.KD.ZG", color: "#059669" },
+              { code: "BN.CAB.XOKA.GD.ZS", color: "#D97706" },
+            ] as const).map(({ code, color }) => {
                 const rows = byCode[code] || [];
                 const data = rows.map((r) => ({ date: r.date, value: r.value }));
                 const label = rows[0]?.name || code;
@@ -149,7 +154,7 @@ export default function Dashboard({ dailyMarket, indicators, lastRefresh }: Dash
                     key={code}
                     title={label}
                     data={data}
-                    color="#8B5CF6"
+                    color={color}
                     unit={rows[0]?.unit || ""}
                   />
                 );
