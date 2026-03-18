@@ -113,9 +113,9 @@ export default function Dashboard({ dailyMarket, indicators, lastRefresh }: Dash
           </div>
         </section>
 
-        {/* Monthly Indicators */}
+        {/* IMF WEO Indicators */}
         <section>
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">Monthly Indicators (IMF IFS)</h2>
+          <h2 className="text-lg font-semibold text-gray-800 mb-3">Macro Fundamentals (IMF WEO)</h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {IMF_INDICATORS.map((ind) => {
               const data = (byCode[ind.code] || []).map((r) => ({

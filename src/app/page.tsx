@@ -9,7 +9,7 @@ async function getDailyMarket() {
   sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
   const { data, error } = await supabase
-    .from("daily_market")
+    .from("ph_daily_market")
     .select("date, ticker, name, close")
     .gte("date", sixMonthsAgo.toISOString().split("T")[0])
     .order("date", { ascending: true });
@@ -23,7 +23,7 @@ async function getDailyMarket() {
 
 async function getIndicators() {
   const { data, error } = await supabase
-    .from("economic_indicators")
+    .from("ph_economic_indicators")
     .select("date, source, code, name, value, unit")
     .order("date", { ascending: true });
 
@@ -36,7 +36,7 @@ async function getIndicators() {
 
 async function getLastRefresh() {
   const { data } = await supabase
-    .from("refresh_log")
+    .from("ph_refresh_log")
     .select("completed_at")
     .eq("status", "success")
     .order("completed_at", { ascending: false })

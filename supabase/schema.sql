@@ -1,8 +1,9 @@
 -- Philippines Economic Impact Dashboard — Supabase Schema
 -- Run this in the Supabase SQL Editor to create all tables
+-- Prefixed with ph_ to avoid conflict with existing website tables
 
 -- Daily market data (Yahoo Finance: Brent, USD/PHP, PSEi, VIX)
-CREATE TABLE daily_market (
+CREATE TABLE ph_daily_market (
   id BIGSERIAL PRIMARY KEY,
   date DATE NOT NULL,
   ticker TEXT NOT NULL,
@@ -17,7 +18,7 @@ CREATE TABLE daily_market (
 );
 
 -- Monthly/annual economic indicators (IMF, World Bank)
-CREATE TABLE economic_indicators (
+CREATE TABLE ph_economic_indicators (
   id BIGSERIAL PRIMARY KEY,
   date DATE NOT NULL,
   source TEXT NOT NULL,
@@ -31,7 +32,7 @@ CREATE TABLE economic_indicators (
 );
 
 -- Refresh audit log
-CREATE TABLE refresh_log (
+CREATE TABLE ph_refresh_log (
   id BIGSERIAL PRIMARY KEY,
   source TEXT NOT NULL,
   status TEXT NOT NULL,
@@ -42,17 +43,17 @@ CREATE TABLE refresh_log (
 );
 
 -- Indexes for dashboard queries
-CREATE INDEX idx_daily_market_ticker_date ON daily_market (ticker, date DESC);
-CREATE INDEX idx_economic_indicators_code_date ON economic_indicators (source, code, date DESC);
-CREATE INDEX idx_refresh_log_started ON refresh_log (started_at DESC);
+CREATE INDEX idx_ph_daily_market_ticker_date ON ph_daily_market (ticker, date DESC);
+CREATE INDEX idx_ph_econ_indicators_code_date ON ph_economic_indicators (source, code, date DESC);
+CREATE INDEX idx_ph_refresh_log_started ON ph_refresh_log (started_at DESC);
 
 -- Row Level Security: allow read access via anon key for the dashboard
-ALTER TABLE daily_market ENABLE ROW LEVEL SECURITY;
-ALTER TABLE economic_indicators ENABLE ROW LEVEL SECURITY;
-ALTER TABLE refresh_log ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ph_daily_market ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ph_economic_indicators ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ph_refresh_log ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Allow public read" ON daily_market FOR SELECT USING (true);
-CREATE POLICY "Allow public read" ON economic_indicators FOR SELECT USING (true);
-CREATE POLICY "Allow public read" ON refresh_log FOR SELECT USING (true);
+CREATE POLICY "Allow public read" ON ph_daily_market FOR SELECT USING (true);
+CREATE POLICY "Allow public read" ON ph_economic_indicators FOR SELECT USING (true);
+CREATE POLICY "Allow public read" ON ph_refresh_log FOR SELECT USING (true);
 
 -- Service role (used by cron) bypasses RLS, so no insert policy needed

@@ -10,17 +10,16 @@ export interface EconIndicatorRow {
   frequency: string;
 }
 
-const IMF_BASE = "https://dataservices.imf.org/REST/SDMX_JSON.svc/CompactData";
+const IMF_BASE = "https://www.imf.org/external/datamapper/api/v1";
 
 export async function fetchIMFData(): Promise<EconIndicatorRow[]> {
   const rows: EconIndicatorRow[] = [];
 
   for (const indicator of IMF_INDICATORS) {
     try {
-      const url = `${IMF_BASE}/IFS/M.PH.${indicator.code}`;
+      const url = `${IMF_BASE}/${indicator.code}/PHL`;
       const res = await fetch(url, {
-        headers: { Accept: "application/json" },
-        signal: AbortSignal.timeout(30000),
+        signal: AbortSignal.timeout(20000),
       });
 
       if (!res.ok) {
@@ -29,25 +28,19 @@ export async function fetchIMFData(): Promise<EconIndicatorRow[]> {
       }
 
       const data = await res.json();
-      const series = data?.CompactData?.DataSet?.Series;
-      if (!series) continue;
+      const values = data?.values?.[indicator.code]?.PHL;
+      if (!values || typeof values !== "object") continue;
 
-      const observations = Array.isArray(series.Obs) ? series.Obs : series.Obs ? [series.Obs] : [];
-
-      for (const obs of observations) {
-        const timePeriod = obs["@TIME_PERIOD"];
-        const value = parseFloat(obs["@OBS_VALUE"]);
-        if (!timePeriod || isNaN(value)) continue;
-
-        // Convert "2024-01" to "2024-01-01"
-        const date = timePeriod.length === 7 ? `${timePeriod}-01` : timePeriod;
+      for (const [year, value] of Object.entries(values)) {
+        const numValue = Number(value);
+        if (isNaN(numValue)) continue;
 
         rows.push({
-          date,
+          date: `${year}-01-01`,
           source: "imf",
           code: indicator.code,
           name: indicator.name,
-          value,
+          value: numValue,
           unit: indicator.unit,
           frequency: indicator.frequency,
         });

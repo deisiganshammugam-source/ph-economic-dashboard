@@ -22,7 +22,7 @@ export async function GET(request: Request) {
 
     if (rows.length > 0) {
       const { error } = await supabase
-        .from("daily_market")
+        .from("ph_daily_market")
         .upsert(rows, { onConflict: "date,ticker" });
 
       if (error) throw error;
@@ -46,7 +46,7 @@ export async function GET(request: Request) {
       for (let i = 0; i < rows.length; i += 500) {
         const chunk = rows.slice(i, i + 500);
         const { error } = await supabase
-          .from("economic_indicators")
+          .from("ph_economic_indicators")
           .upsert(chunk, { onConflict: "date,source,code" });
         if (error) throw error;
       }
@@ -67,7 +67,7 @@ export async function GET(request: Request) {
 
     if (rows.length > 0) {
       const { error } = await supabase
-        .from("economic_indicators")
+        .from("ph_economic_indicators")
         .upsert(rows, { onConflict: "date,source,code" });
       if (error) throw error;
     }
@@ -90,7 +90,7 @@ async function logRefresh(
   errorMessage: string | null,
   startedAt: string
 ) {
-  await supabase.from("refresh_log").insert({
+  await supabase.from("ph_refresh_log").insert({
     source,
     status,
     records_upserted: count,

@@ -7,14 +7,13 @@ export const DAILY_TICKERS = [
   { ticker: "^VIX", name: "VIX", color: "#EF4444", unit: "pts", prefix: "" },
 ] as const;
 
+// IMF DataMapper API indicators (annual, includes WEO forecasts)
 export const IMF_INDICATORS = [
-  { code: "PCPI_IX", name: "Consumer Price Index", unit: "Index", frequency: "monthly" },
-  { code: "FILR_PA", name: "Lending Rate", unit: "%", frequency: "monthly" },
-  { code: "FIGB_PA", name: "Govt Bond Yield", unit: "%", frequency: "monthly" },
-  { code: "ENDA_XDC_USD_RATE", name: "Exchange Rate (IMF)", unit: "PHP/USD", frequency: "monthly" },
-  { code: "RAFA_USD", name: "Reserve Assets", unit: "USD millions", frequency: "monthly" },
-  { code: "TMG_CIF_USD", name: "Goods Imports", unit: "USD millions", frequency: "monthly" },
-  { code: "TXG_FOB_USD", name: "Goods Exports", unit: "USD millions", frequency: "monthly" },
+  { code: "PCPIPCH", name: "CPI Inflation (%)", unit: "%", frequency: "annual" },
+  { code: "NGDP_RPCH", name: "Real GDP Growth (%)", unit: "%", frequency: "annual" },
+  { code: "BCA_NGDPD", name: "Current Account (% of GDP)", unit: "%", frequency: "annual" },
+  { code: "GGXWDG_NGDP", name: "Govt Debt (% of GDP)", unit: "%", frequency: "annual" },
+  { code: "LUR", name: "Unemployment Rate (%)", unit: "%", frequency: "annual" },
 ] as const;
 
 export const WORLDBANK_INDICATORS = [
