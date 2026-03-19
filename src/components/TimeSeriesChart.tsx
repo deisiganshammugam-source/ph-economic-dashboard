@@ -61,9 +61,54 @@ export default function TimeSeriesChart({
   // Sanitize gradient ID (no spaces/special chars)
   const gradId = `grad-${title.replace(/[^a-zA-Z0-9]/g, "")}`;
 
+  // Compute YTD change for daily data
+  let ytdChange: number | null = null;
+  let feb28Change: number | null = null;
+  if (!isAnnual && sorted.length >= 2) {
+    const latest = sorted[sorted.length - 1];
+    const currentYear = new Date(latest.date).getFullYear();
+    const yearEnd = `${currentYear - 1}-12-31`;
+    const feb28Date = "2025-02-28";
+
+    // Find closest row on or before target
+    const findClosest = (target: string) => {
+      let best: DataPoint | null = null;
+      for (const row of sorted) {
+        if (row.date <= target) best = row;
+        else break;
+      }
+      return best;
+    };
+
+    const ytdRow = findClosest(yearEnd);
+    if (ytdRow) ytdChange = ((latest.value - ytdRow.value) / ytdRow.value) * 100;
+
+    const feb28Row = findClosest(feb28Date);
+    if (feb28Row) feb28Change = ((latest.value - feb28Row.value) / feb28Row.value) * 100;
+  }
+
+  const formatBadge = (label: string, val: number | null) => {
+    if (val === null) return null;
+    const isPos = val >= 0;
+    const cls = isPos ? "text-red-600 bg-red-50" : "text-green-700 bg-green-50";
+    return (
+      <span key={label} className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ${cls}`}>
+        {label}: {isPos ? "+" : ""}{val.toFixed(2)}%
+      </span>
+    );
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-      <h3 className="text-sm font-semibold text-gray-700 mb-3">{title}</h3>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-semibold text-gray-700">{title}</h3>
+        {!isAnnual && (
+          <div className="flex gap-1.5">
+            {formatBadge("YTD", ytdChange)}
+            {formatBadge("Feb 28", feb28Change)}
+          </div>
+        )}
+      </div>
       <ResponsiveContainer width="100%" height={height}>
         <AreaChart data={displayData} margin={{ top: 5, right: 15, left: 5, bottom: 5 }}>
           <defs>
