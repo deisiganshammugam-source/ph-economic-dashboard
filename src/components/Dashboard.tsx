@@ -26,13 +26,35 @@ interface DashboardProps {
   lastRefresh: string | null;
 }
 
-function getLatestAndChange(data: MarketRow[]) {
-  if (data.length < 1) return { latest: null, change: null };
+function findClosestRow(data: MarketRow[], targetDate: string): MarketRow | null {
+  // Find the row on or just before the target date
+  const sorted = [...data].sort((a, b) => a.date.localeCompare(b.date));
+  let best: MarketRow | null = null;
+  for (const row of sorted) {
+    if (row.date <= targetDate) best = row;
+    else break;
+  }
+  return best;
+}
+
+function getLatestAndChanges(data: MarketRow[]) {
+  if (data.length < 1) return { latest: null, change: null, ytdChange: null, feb28Change: null };
   const sorted = [...data].sort((a, b) => b.date.localeCompare(a.date));
   const latest = sorted[0];
   const prev = sorted[1];
   const change = prev ? ((latest.close - prev.close) / prev.close) * 100 : null;
-  return { latest, change };
+
+  // YTD: change since last trading day of previous year (Dec 31 or closest before)
+  const currentYear = new Date(latest.date).getFullYear();
+  const yearEnd = `${currentYear - 1}-12-31`;
+  const ytdRow = findClosestRow(data, yearEnd);
+  const ytdChange = ytdRow ? ((latest.close - ytdRow.close) / ytdRow.close) * 100 : null;
+
+  // Since Feb 28, 2025
+  const feb28Row = findClosestRow(data, "2025-02-28");
+  const feb28Change = feb28Row ? ((latest.close - feb28Row.close) / feb28Row.close) * 100 : null;
+
+  return { latest, change, ytdChange, feb28Change };
 }
 
 export default function Dashboard({ dailyMarket, indicators, lastRefresh }: DashboardProps) {
@@ -77,13 +99,15 @@ export default function Dashboard({ dailyMarket, indicators, lastRefresh }: Dash
         {/* Metric Cards */}
         <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {DAILY_TICKERS.map((t) => {
-            const { latest, change } = getLatestAndChange(byTicker[t.ticker] || []);
+            const { latest, change, ytdChange, feb28Change } = getLatestAndChanges(byTicker[t.ticker] || []);
             return (
               <MetricCard
                 key={t.ticker}
                 label={t.name}
                 value={latest ? latest.close.toLocaleString(undefined, { maximumFractionDigits: 2 }) : "—"}
                 change={change}
+                ytdChange={ytdChange}
+                feb28Change={feb28Change}
                 color={t.color}
                 prefix={t.prefix}
               />
